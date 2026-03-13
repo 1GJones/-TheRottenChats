@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 
 export default function RegisterPage() {
@@ -23,7 +24,7 @@ export default function RegisterPage() {
                 method: 'POST',
                 body: JSON.stringify(formData),
                 headers: { 'Content-Type' : 'application/json'},
-        })
+        });
         
         const data = await res.json()
 
@@ -121,7 +122,7 @@ return (
                     onChange={handleChange}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring"
                     placeholder="********"
-                    minlength={6}
+                    minLength={6}
                     required
                     />
                     </div>

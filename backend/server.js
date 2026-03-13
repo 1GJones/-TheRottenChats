@@ -22,14 +22,15 @@ app.get('/api', (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const hashedPassword = await bcryptjs.hash(password, 10);
+    const hashed = await bcryptjs.hash(password, 10);
     const userId = Date.now().toString();
+    // ✅ sign with userId (or an object you actually defined)
     const token = jwt.sign({ userId }, 'supersecretkey', { expiresIn: '24h' });
     
     res.json({
       success: true,
       message: 'User registered',
-      user: { id: userId, name, email },
+      userId: { id: userId, name, email },
       token
     });
   } catch (error) {
@@ -45,6 +46,7 @@ app.post('/api/auth/login', async (req, res) => {
   res.json({
     success: true,
     message: 'Login successful',
+    user: {id: userId, email},
     token
   });
 });
