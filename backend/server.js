@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const PORT = 8000;
 
+
 // Middleware
 app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
@@ -39,6 +40,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 app.post('/api/auth/login', async (req, res) => {
+  console.log('🔐 Login attempt:', req.body);
   const { email, password } = req.body;
   const userId = Date.now().toString();
   const token = jwt.sign({ userId }, 'supersecretkey', { expiresIn: '24h' });
@@ -47,7 +49,7 @@ app.post('/api/auth/login', async (req, res) => {
     success: true,
     message: 'Login successful',
     user: {id: userId, email},
-    token
+    token: token
   });
 });
 

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect,useState } from "react";
+import Link from "next/link";
 
 export default function DashboardPage(){
     const [email, setEmail]= useState<string | null>(null);
@@ -19,7 +20,7 @@ export default function DashboardPage(){
 
         setEmail(storedEmail);
         setLoading(false);
-        
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -51,13 +52,23 @@ return (
         <p className="text-lg mb-4">You&aposre logged in as<span className="font-medium">{email}</span></p>
         <button
         className="mt-4 bg-gray-800 text-white px-4 py-2 rounded"
+        
         onClick={() =>{
             localStorage.removeItem("token");
             localStorage.removeItem("email");
             window.location.href ="/login";
 
+            
+
         }}
+        
         >
+            <Link
+                href="/chat-rooms"
+                className="mt-4 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+                >
+                Go to Chat Rooms
+        </Link>
             Log out
         </button>
     </main>

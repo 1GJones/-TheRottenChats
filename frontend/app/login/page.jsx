@@ -1,26 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
-    const [formData,setFormData] = useState({ email: '', password: ''})
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState('')
-    const [success, setSuccess] = useState ('')
+    const [formData,setFormData] = useState({ email: '', password: '' });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState ('');
+    const router = useRouter();
 
     const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value})
+        setFormData({...formData, [e.target.name]: e.target.value});
 
 
-    }
+    };
     
     const handleSubmit = async (e) => {
-        console.log("Submitting login form with:", formData);  // <--- add this
+        console.log("Submitting login form with:", formData);  
 
-        e.preventDefault()
-        setError('')
-        setSuccess('')
-        setLoading(true)
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+        setLoading(true);
+        // TEST: Backend alive?
+    try {
+        const test = await fetch("http://localhost:8000/");
+        console.log("✅ Backend alive:", await test.json());
+    } catch (err) {
+        console.log("❌ Backend DEAD:", err.message);
+        setError("Backend not running! Start: cd backend && npm run dev");
+        return;
+    }
 
 
         try {
@@ -39,35 +51,43 @@ export default function LoginPage() {
 
             
 
-            if (!res.ok || data.success === false) {
-                throw new Error(data.error || data.message || "Logn failed"); 
+            if (res.ok && data.success) {
+                // ✅ Save to localStorage and redirect
+                localStorage.setItem("token",data.token);
+                localStorage.setItem("email",data.user.email || formData.email);
+                setSuccess("Login successful! Redirecting...");
+                
+                // Redirect to chat rooms
+
+                setTimeout(() => {
+                    router.push("/chat-rooms");
+                }, 1000);
+            } else {
+                setError(data.error || "login failed");
             }
 
-            if (data.token) {
-                localStorage.setItem("token", data.token);
-            }
-            setSuccess("Logged in! (Next step: redirect to chat/dashboard)");
-        }catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
 
+        }  catch (err) {
+               console.error("Login error:", err);
+               setError("Network error. Is backend running on port 8000?");
+            }finally {
+                setLoading(false);
+            }
+     
         };
 
         return (
-            <main className="min-h-screen flex items-center justify-center bg-gray-100">
-                <form
-                onSubmit={handleSubmit}
-                className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8"
-                >
-                    <h1 className="text-2xl font-semibold mb-6 text-center">Log in</h1>
-                    {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-                    {success && <p className="mb-4 text-sm text-green-600">{success}</p>}
+              <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-600 px-4 py-12">
+                <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-8">
+                <div className="text-center">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+                    <p className="text-gray-600">Sign in to your account</p>
+                </div>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1" htmlFor="email">
-                            Email
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                Email
                         </label>
                         <input 
                         id="email"
@@ -75,39 +95,69 @@ export default function LoginPage() {
                         type="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="shadow appearance-none boader rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring"
+                        required 
+                        disabled={loading}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
                         placeholder="you@example.com"
                         autoComplete="email"
-                        required
+                        
                         />
                         </div>
 
-                        <div className="mb-6">
-                        <label className="block text-sm font-medium mb-1" htmlFor="password"> 
-                        Password
+                        <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                            Password
                         </label>
                         <input
+                            type="password"
                             id="password"
                             name="password"
-                            type="password"
                             value={formData.password}
                             onChange={handleChange}
-                            autoComplete="current-password"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring"
-                            placeholder="••••••••"
                             required
-                            />
-                            <button 
-                            type="submit"
                             disabled={loading}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 route focus:outline-none focus:ring disabled:opacity-60"
-                            >
-                                {loading ? "Logging in..." : "Log in"}
-                            </button>
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
+                            placeholder="••••••••"
+                        />
                     </div>
+
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl text-sm">
+                            {error}
+                        </div>
+                    )}
+
+                    {success && (
+                        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm">
+                            {success}
+                        </div>
+                    )}
+
+                    <button
+                        type="submit"
+                        disabled={loading || !formData.email || !formData.password}
+                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2"
+                    >
+                        {loading ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                <span>Signing in...</span>
+                            </>
+                        ) : (
+                            'Sign In'
+                        )}
+                    </button>
                 </form>
-            </main>
+
+                <div className="text-center">
+                   <p className="text-sm text-gray-600">
+                        Dont have an account?{' '}
+                        <Link href="#" className="font-semibold text-purple-600 hover:text-purple-700">
+                            Sign up
+                        </Link>
+                    </p>
+                </div>
+            </div>
+        </main>
     );
-    }
-
-
+}
