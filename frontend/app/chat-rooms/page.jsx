@@ -33,8 +33,8 @@ export default function ChatRoomsPage() {
    
 
     return(
-        <main className="min-h-screen bg-gray-s0 py-12 px-4">
-            <div className="max-w-4x1 mx-auto">
+        <main className="min-h-screen bg-gray-50 py-12 px-4">
+            <div className="max-w-4x1 4x1">
                 <div className="flex justify-between items-center mb-12">
                     <div>
                         <h1 className="text-4x1 font-bold text-gray-900 mb-2">Chat Rooms</h1>

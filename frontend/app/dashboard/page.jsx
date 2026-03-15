@@ -3,11 +3,24 @@ import { useEffect,useState } from "react";
 import Link from "next/link";
 
 export default function DashboardPage(){
-    const [email, setEmail]= useState<string | null>(null);
+    const [email, setEmail]= useState("");
     const [loading, setLoading]= useState (true);
 
     useEffect(() => {
+        async function getUser(){
+            try{
+                const res = await fetch("/api/user");
+                const data = await res.json();
+                setEmail(data.email);
+            }catch(error){
+                console.error("Failed to fetch user", error);
+                setEmail(null);
 
+            }finally{
+                setLoading(false);
+            }
+        }
+        
         // Simulate a simple a client-side "auth" check
 
         const token = localStorage.getItem("token");
@@ -20,6 +33,7 @@ export default function DashboardPage(){
 
         setEmail(storedEmail);
         setLoading(false);
+        getUser();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
