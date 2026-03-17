@@ -1,5 +1,4 @@
 import Navbar from './components/navbar';
-
 import "./globals.css";
 
 
@@ -15,9 +14,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="antialiased font-sans"
+        className="antialiased"
       >
-        {/* <Navbar /> */}
+        <Navbar />
         {children}
       </body>
     </html>

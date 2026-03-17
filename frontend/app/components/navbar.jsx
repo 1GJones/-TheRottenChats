@@ -1,24 +1,38 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from 'react';
+
+
+// Wait for client
 
 export default function Navbar() {
+
   // Read directly - ignore hydration (React 18 handles it)
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const pathname = typeof window !== "undefined" ? window.location.pathname : '/';
-  // Show nothing on login or SSR
-  if ( !token || pathname === "/login") return null;
+const [isClient , setIsClient]= useState(false);  
+const [token, setToken] = useState(null);
+const [pathname, setPathname]= useState(null);
+
+useEffect(() => {
+  // Only runs on client after mount
+  setIsClient(true);
+  setToken(localStorage.getItem("token"));
+  setPathname(window.location.pathname);
+
+}, []);
+
+if (!isClient)return null;
+if (!token || pathname === "/login") return null;
 
   const handleLogout = () => {
-    if (typeof window !== "undefined"){
+    
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     window.location.href = "/login";
-  }
   };
   return (
 <nav className="bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200 sticky top-0 z-50">
-           {/* <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/chat-rooms" className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             💕 RottenChats
@@ -35,7 +49,7 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-      </div> */}
+      </div>
     </nav>
   );
 }
