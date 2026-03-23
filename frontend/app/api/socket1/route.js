@@ -4,11 +4,19 @@ import { Server } from "socket.io";
 let io;
 
 export async function GET(){
+    try{
     if (!io){
         // Attach Socket.IO to the existing Next.js server 
         // In dev, this will be created on first GET /api/socet
-        io = new Server(globalThis._httpServer || 3001, {
-            cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+
+        // Typo and path mismatch
+        // io = new Server(globalThis._httpServer || 3001, {
+        //     cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+        //     path: '/api/socket',
+        // });
+            io = new Server ({
+                cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+             path: '/api/socket',
         });
 
         io.on("connection", (socket) => {
@@ -36,4 +44,12 @@ export async function GET(){
     });
 }
 return NextResponse.json({ status: "ok"});
+} catch (error) {
+    console.error("Socket init error:", error);
+    return NextResponse.json(
+        {error: "Socket server error"},
+        {status: 500}
+
+    );
+}
 }
